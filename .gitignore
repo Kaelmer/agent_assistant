@@ -33,8 +33,11 @@ agent_memory.db-wal
 src/chroma_db/
 *.log
 
-# 其他
-models/
+# 模型文件夹
+models/*
+!models/.gitignore
+!models/README.md
+# 其他大文件
 *.bin
 *.safetensors
 *.h5

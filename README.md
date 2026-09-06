@@ -50,7 +50,7 @@ agent_assistant/
 ├── db/
 │   └── agent_memory.db   # SQLite 会话记忆（运行时生成）
 ├── agent_work/           # 默认工作区（Agent 操作文件的位置）
-├── models/               # 本地 embedding 模型（all-MiniLM-L6-v2）
+├── models/               #  # 模型文件夹（需自行下载，见 README）（all-MiniLM-L6-v2,ms-marco-MiniLM-L6-v2）
 ├── .env                  # 密钥与模型配置（勿提交到版本库）
 ├── requirements.txt
 ├── pyproject.toml
