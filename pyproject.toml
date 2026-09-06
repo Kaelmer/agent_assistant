@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-file-assistant"
+version = "0.1.0"
+description = "基于 DeepSeek API + LangGraph 的智能文件操作助手"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "langchain",
+    "langchain-openai",
+    "langchain-core",
+    "langgraph",
+    "langgraph-checkpoint-sqlite",
+    "langgraph-supervisor",
+    "chromadb",
+    "sentence-transformers",
+    "python-dotenv",
+    "pymysql",
+    "pydantic",
+    "python-multipart",
+    "beautifulsoup4",
+    "requests",
+    "duckduckgo-search",
+]
+
+[tool.setuptools]
+packages = ["src"]
+
+# 注意：templates/ 与 static/ 位于项目根目录（源码运行方式），未打入 wheel；
+# 请保持从项目根目录运行：uvicorn src.app:app

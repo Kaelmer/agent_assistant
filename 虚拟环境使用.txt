@@ -1,0 +1,7 @@
+python -m venv venv
+
+# 激活（Windows）
+.\venv\Scripts\Activate.ps1
+
+# 激活后装依赖
+pip install -r requirements.txt

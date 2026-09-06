@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent助手</title>
+    <link rel="stylesheet" href="/static/css/chat.css">
+</head>
+<body>
+    <main class="chat-container">
+        <div id="messages" class="messages" aria-live="polite">
+            <div class="message assistant">
+                <div class="bubble">你好，我是Agent助手，请输入你的需求。</div>
+            </div>
+        </div>
+
+        <form id="chat-form" class="input-bar">
+            <button type="button" id="uploadFileBtn">添加文件</button>
+            <input type="file" id="fileInput" style="display:none;" multiple>
+            <textarea
+                id="user-input"
+                placeholder="输入需求…"
+                autocomplete="off"
+                autofocus
+                rows="1"
+            ></textarea>
+            <button type="submit" id="send-btn">发送</button>
+        </form>
+    </main>
+
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>
