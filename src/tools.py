@@ -198,17 +198,24 @@ def delete_ch_file(filename: str) -> str:
 
 @tool
 def fetch_webpage(url: str) -> str:
-    """获取网页的文字内容，传入网址"""
+    """
+    获取网页的文字内容，传入网址
+    Args:
+        url: 需要抓取文本的网页链接
+    Returns:
+        清理后的网页纯文本；失败则返回错误说明
+    """
     try:
         resp = requests.get(url, timeout=10)
-        resp.raise_for_status()
-        resp.encoding = resp.apparent_encoding or "utf-8"
-        
+        resp.raise_for_status()   # 如果HTTP状态码是4xx/5xx，主动抛出异常，进入except捕获
+        resp.encoding = resp.apparent_encoding or "utf-8"  # 自动识别网页编码；识别失败默认使用utf‑8，避免中文乱码
+        # 使用BeautifulSoup加载网页HTML
         soup = BeautifulSoup(resp.text, "html.parser")
         for tag in soup(["script", "style", "noscript"]):
-            tag.decompose()
+            tag.decompose()   # 删除页面里不需要的标签：脚本、样式、无脚本区块，剔除代码和样式垃圾文本
+        # 提取网页所有可见文字，用空格分隔，去除首尾空白
         text = soup.get_text(" ", strip=True)
-        text = " ".join(text.split())  # 清理多余空白
+        text = " ".join(text.split())
         return text[:3000] if text else "页面内容为空"
     except Exception as e:
         return f"抓取网页失败：{e}"
@@ -222,24 +229,31 @@ def web_search(query: str) -> str:
     - 用户明确说"搜索""联网""查一下""帮我看看"
     - 任何需要最新数据而不是你内部知识的问题
     传入搜索关键词，返回搜索结果列表。"""
-    try:
-        url = f"https://www.bing.com/search?q={query}"
-        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-        resp = requests.get(url, headers=headers, timeout=15)
-        soup = BeautifulSoup(resp.text, "html.parser")
-        
-        results = []
-        for item in soup.select("li.b_algo h2 a"):
-            text = item.get_text(strip=True)
-            href = item.get("href", "")
-            if text:
-                results.append(f"{text}: {href}")
-        
-        if not results:
-            return "没有找到搜索结果"
-        return "\n".join(results[:5])
-    except Exception as e:
-        return f"搜索失败：{str(e)}"
+    sources = [
+        f"https://www.bing.com/search?q={query}",
+        f"https://www.baidu.com/s?wd={query}",
+        f"https://html.duckduckgo.com/html/?q={query}",
+    ]
+    for url in sources:
+        try:
+        # 请求头，模拟浏览器访问，防止被网站识别为爬虫拦截
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            resp = requests.get(url, headers=headers, timeout=15)
+            soup = BeautifulSoup(resp.text, "html.parser")
+            results = []
+            # CSS选择器，筛选必应自然搜索结果条目：li.b_algo下h2里面的a标签
+            for item in soup.select("li.b_algo h2 a"):
+                text = item.get_text(strip=True)
+                href = item.get("href", "")
+                if text:
+                    # 把标题和链接拼成一行字符串存入列表
+                    results.append(f"{text}: {href}")
+            if not results:
+                return "没有找到搜索结果"
+            return "\n".join(results[:5])
+        except Exception as e:
+            continue
+    return "所有搜索源均失败，请稍后重试"
 
 
 @tool

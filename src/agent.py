@@ -7,10 +7,10 @@ from langchain.agents.middleware import before_model
 from langchain_core.messages import RemoveMessage
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.runtime import Runtime
-from langchain_core.runnables import RunnableConfig
 from typing import Any
 from langgraph.checkpoint.sqlite import SqliteSaver
 import sqlite3
+
 
 llm = ChatOpenAI(
     model=DEEPSEEK_MODEL,
@@ -19,6 +19,7 @@ llm = ChatOpenAI(
     temperature=0.7,
     max_tokens=1000
 )
+    
 
 @before_model
 def trim_messages(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
@@ -51,7 +52,7 @@ agent = create_supervisor(
 1. 如果用户需要创建、读取、修改、删除、重命名文件或文件夹，请使用 file_agent。
 2. 如果用户需要查询知识库或管理知识库（向量数据库）中的文档，请使用 rag_agent。
 3. 如果用户需要实时、最新或具体的事实信息（天气、新闻、股价等），或向量数据库查不到，或用户明确说"上网"，"搜索""联网""查一下"，必须调用 web_agent，不要直接回答不知道。
-4. 如果以上情况都不符合，可以调用web_agent,请直接给出回答。"""
+4. 如果以上情况都不符合，可以调用web_agent,给出回答。"""
 ).compile(checkpointer=checkpointer)
 
 

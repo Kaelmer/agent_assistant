@@ -14,6 +14,8 @@ from agent import get_history
 from rag_util import add_document
 from agent import agent
 import time
+from logger import log_error
+import traceback
 
 app = FastAPI()
 
@@ -40,16 +42,20 @@ class ChatRequest(BaseModel):
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
-    try:
-        messages = [{"role": m.role, "content": m.content} for m in req.messages]
-        reply = run_agent(messages, req.thread_id)
-        def generate():
-            for char in reply:
-                yield char
-                time.sleep(0.02)
-        return StreamingResponse(generate())
-    except Exception as e:
-        return {"error": str(e)}
+    messages = [{"role": m.role, "content": m.content} for m in req.messages]
+    for attempt in range(3):
+        try:
+            reply = run_agent(messages, req.thread_id)
+            def generate():
+                for char in reply:
+                    yield char
+                    time.sleep(0.02)
+            return StreamingResponse(generate())
+        except Exception as e:
+            if attempt==2:
+                log_error(f"chat 接口报错：{str(e)}\n{traceback.format_exc()}")
+                return {"error": "网络繁忙·请稍后再试"}
+    return {"error":"未知错误"}
 
 
 @app.post("/api/upload")
@@ -60,6 +66,7 @@ async def upload_file(files: list[UploadFile]):
             add_document(text,file.filename)
         return {"message": "文件上传成功"}
     except Exception as e:
+        log_error(f"upload接口错误：{str(e)}\n{traceback.format_exc()}")
         return {"error": str(e)}
 
 @app.get("/api/history/{thread_id}")
