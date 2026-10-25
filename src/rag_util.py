@@ -13,7 +13,7 @@ collection=chroma_client.get_or_create_collection(name="my_collection")
 
 from Retry import retry
 
-@retry(max_attempts=3, delay=1)
+@retry(attempts_max=3, delay=1)
 def call_llm(messages):
     """调用 LLM，失败自动重试"""
     return llm.invoke(messages)
